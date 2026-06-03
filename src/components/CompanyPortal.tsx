@@ -11,17 +11,20 @@ import { getStoredWorkers, saveWorkers } from "../utils/mockData";
 import DocumentInspector from "./DocumentInspector";
 import MetricsDashboard from "./MetricsDashboard";
 import DatabaseSchemaViewer from "./DatabaseSchemaViewer";
+import { LanguageType, TRANSLATIONS } from "../utils/translations";
 
 interface CompanyPortalProps {
   workers: Worker[];
   onUpdateWorkers: (updated: Worker[]) => void;
   onSelectWorkerForMobile: (workerCpf: string) => void;
+  currentLang?: LanguageType;
 }
 
 export default function CompanyPortal({ 
   workers, 
   onUpdateWorkers,
-  onSelectWorkerForMobile 
+  onSelectWorkerForMobile,
+  currentLang = "pt"
 }: CompanyPortalProps) {
   // Main Active Tab for Portal
   const [activeTab, setActiveTab] = useState<"directory" | "metrics" | "database">("directory");
@@ -295,7 +298,7 @@ export default function CompanyPortal({
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>Gestão de Colaboradores</span>
+          <span>{TRANSLATIONS[currentLang].workersManagement}</span>
         </button>
         <button
           onClick={() => setActiveTab("metrics")}
@@ -306,7 +309,7 @@ export default function CompanyPortal({
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          <span>Métricas de Conformidade</span>
+          <span>{TRANSLATIONS[currentLang].metricsLabel}</span>
         </button>
         <button
           onClick={() => setActiveTab("database")}
@@ -317,7 +320,7 @@ export default function CompanyPortal({
           }`}
         >
           <Database className="w-4 h-4" />
-          <span>Modelagem BD &amp; APIs (TCC)</span>
+          <span>{TRANSLATIONS[currentLang].databaseLabel}</span>
         </button>
       </div>
 

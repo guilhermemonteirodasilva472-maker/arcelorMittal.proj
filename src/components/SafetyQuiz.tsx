@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Play, Pause, RotateCw, CheckCircle2, AlertTriangle, 
-  HelpCircle, ChevronRight, Award, ShieldAlert, Video, Eye, ThumbsUp 
+  HelpCircle, ChevronRight, Award, ShieldAlert, Video, Eye, ThumbsUp, FileText 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Worker, DocumentStatus } from "../types";
 import { SAFETY_QUESTIONS } from "../utils/mockData";
+import CertificateModal from "./CertificateModal";
 
 interface SafetyQuizProps {
   worker: Worker;
@@ -23,6 +24,7 @@ export default function SafetyQuiz({ worker, onUpdateWorker }: SafetyQuizProps) 
   const [isAnswered, setIsAnswered] = useState(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [quizFinished, setQuizFinished] = useState(worker.quizCompleted);
+  const [isCertOpen, setIsCertOpen] = useState(false);
   
   // Video simulation timer
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -323,11 +325,24 @@ export default function SafetyQuiz({ worker, onUpdateWorker }: SafetyQuizProps) 
                   >
                     Refazer Teste
                   </button>
+                  <button
+                    onClick={() => setIsCertOpen(true)}
+                    className="w-full sm:w-auto px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center space-x-1 shadow-sm"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Ver Certificado (PDF)</span>
+                  </button>
                   <div className="flex items-center space-x-1 bg-green-200 text-green-900 border border-green-300 font-mono text-[10px] font-bold px-3 py-2 rounded-lg">
                     <ThumbsUp className="w-3.5 h-3.5 mr-1" />
-                    <span>Treinamento Registrado</span>
+                    <span>Frequência Ok</span>
                   </div>
                 </div>
+
+                <CertificateModal 
+                  worker={worker} 
+                  isOpen={isCertOpen} 
+                  onClose={() => setIsCertOpen(false)} 
+                />
               </motion.div>
             ) : (
               /* Active quiz state */

@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import CompanyPortal from "./components/CompanyPortal";
 import WorkerPortal from "./components/WorkerPortal";
+import InteractiveTutorial from "./components/InteractiveTutorial";
 import { Worker, DocumentStatus } from "./types";
 import { getStoredWorkers, saveWorkers, INITIAL_WORKERS } from "./utils/mockData";
 import { HelpCircle, ChevronRight, CheckCircle, Smartphone, Award, ClipboardCheck } from "lucide-react";
+import { LanguageType, TRANSLATIONS } from "./utils/translations";
 
 export default function App() {
   const [persona, setPersona] = useState<"company" | "worker">("company");
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedMobileWorkerCpf, setSelectedMobileWorkerCpf] = useState<string>("");
+  const [lang, setLang] = useState<LanguageType>("pt");
 
   // Load workers
   useEffect(() => {
@@ -29,17 +32,34 @@ export default function App() {
   };
 
   const handleResetDemoData = () => {
-    if (confirm("Deseja resetar a simulação para o estado inicial de fábrica?")) {
-      localStorage.removeItem("am_onboarding_workers");
+    const confirmMsg = TRANSLATIONS[lang].btnResetConfirm;
+    if (confirm(confirmMsg)) {
+      localStorage.removeItem("cl_onboarding_workers");
       setWorkers(INITIAL_WORKERS);
       setSelectedMobileWorkerCpf("");
-      alert("Dados resetados!");
+      alert(TRANSLATIONS[lang].alertReset);
     }
   };
 
   const handleSelectWorkerForMobile = (cpf: string) => {
     setSelectedMobileWorkerCpf(cpf);
     setPersona("worker");
+  };
+
+  const handleSimulateLucas = (lucas: Worker) => {
+    const filtered = workers.filter(w => w.id !== lucas.id);
+    const newList = [lucas, ...filtered];
+    setWorkers(newList);
+    saveWorkers(newList);
+    setSelectedMobileWorkerCpf(lucas.cpf);
+    
+    const message = {
+      pt: "Simulação de Lucas Mendes ativada!\n\nEle foi adicionado no sistema como Soldador da Sul Metalúrgica.\n\nPróximos passos sugeridos:\n1. Vá na aba 'Empresa Parceira' abaixo para auditar seus documentos.\n2. Alterne para a aba 'Trabalhador (Mobile)' e faça login com seu CPF para concluir o treinamento!",
+      en: "Lucas Mendes simulation enabled!\n\nHe has been registered as an Industrial Welder for Sul Metalúrgica.\n\nRecommended next steps:\n1. Check 'Partner Company' tab below to review/audit his PDFs.\n2. Switch to 'Worker (Mobile)' and log in using his CPF to take the safety video and quiz!",
+      es: "¡Simulación de Lucas Mendes activada!\n\nSe ha añadido como Soldador Mecánico para Sul Metalúrgica.\n\nPasos recomendados:\n1. Mire la pestaña 'Empresa Contratista' abajo para auditar sus archivos.\n2. Cambie a 'Trabajador (Móvil)' e inicie sesión con su CPF para tomar el entrenamiento teórico!"
+    }[lang];
+    
+    alert(message);
   };
 
   return (
@@ -49,6 +69,8 @@ export default function App() {
         currentPersona={persona} 
         setPersona={setPersona} 
         onReset={handleResetDemoData} 
+        currentLang={lang}
+        setLang={setLang}
       />
 
       {/* Main Container */}
@@ -61,35 +83,42 @@ export default function App() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5 max-w-3xl">
               <span className="bg-orange-500 text-slate-950 font-mono text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                Mentoria Técnica UI/UX & Dev Sênior
+                {TRANSLATIONS[lang].subtitleBanner}
               </span>
               <h1 className="font-sans font-bold text-lg md:text-xl text-white tracking-tight">
-                Central de Integração e Onboarding de Terceiros — Protótipo de Engenharia
+                {TRANSLATIONS[lang].titleBanner}
               </h1>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Este sistema simula o fim de filas físicas e eliminação de processos burocráticos manuais. 
-                Use a aba <strong>Empresa Parceira</strong> abaixo para cadastrar eletricistas ou mecânicos, preencher e submeter seus documentos obrigatórios e simular a aprovação técnica deles. 
-                Depois, troque para o modo <strong>Trabalhador (Mobile)</strong> para assistir ao treinamento animado, responder ao quiz interativo de segurança e liberar o selo QR Code de acesso instantâneo na portaria física!
+                {TRANSLATIONS[lang].helperTextBanner}
               </p>
             </div>
             
             <div className="flex-shrink-0 bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-2 max-w-xs">
-              <p className="text-[10px] font-bold uppercase text-orange-400 tracking-wider font-mono">Dica de Fluxo Acadêmico</p>
+              <p className="text-[10px] font-bold uppercase text-orange-400 tracking-wider font-mono">
+                {lang === "en" ? "ACADEMIC FLOW TIPS" : lang === "es" ? "CONSEJOS DE FLUJO" : "DICA DE FLUXO ACADÊMICO"}
+              </p>
               <div className="flex items-center space-x-1.5 text-xs text-slate-200">
                 <span className="font-bold text-orange-500">1.</span>
-                <span>Submeta as NRs no Painel da Empresa</span>
+                <span>{TRANSLATIONS[lang].flowStep1}</span>
               </div>
               <div className="flex items-center space-x-1.5 text-xs text-slate-200">
                 <span className="font-bold text-orange-500">2.</span>
-                <span>Aprove os documentos no Painel Direita</span>
+                <span>{TRANSLATIONS[lang].flowStep2}</span>
               </div>
               <div className="flex items-center space-x-1.5 text-xs text-slate-200">
                 <span className="font-bold text-orange-500">3.</span>
-                <span>Emule o trabalhador no celular e faça o Quiz!</span>
+                <span>{TRANSLATIONS[lang].flowStep3}</span>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Interactive Tutorial Component */}
+        <InteractiveTutorial 
+          currentLang={lang} 
+          workers={workers} 
+          onSimulateLucas={handleSimulateLucas} 
+        />
 
         {/* Dynamic Views based on persona */}
         {persona === "company" ? (
@@ -98,6 +127,7 @@ export default function App() {
               workers={workers}
               onUpdateWorkers={handleUpdateWorkers}
               onSelectWorkerForMobile={handleSelectWorkerForMobile}
+              currentLang={lang}
             />
           </div>
         ) : (
@@ -105,16 +135,18 @@ export default function App() {
             {/* Guide Explainer left column */}
             <div className="lg:col-span-6 space-y-5">
               <span className="bg-green-500/10 text-green-700 font-mono text-[10px] font-bold px-2 py-0.5 rounded border border-green-500/20 uppercase tracking-wider">
-                Simulação Smartphone
+                {TRANSLATIONS[lang].mobileUXSubtitle}
               </span>
               <h2 className="font-sans font-bold text-slate-900 text-lg md:text-xl tracking-tight">
-                Mobile-First UX: Interface Direta com o Trabalhador de Campo
+                {TRANSLATIONS[lang].mobileUXTitle}
               </h2>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Operários e prestadores de serviços de campo acessam o sistema diretamente de seus celulares 
-                através de links SMS ou totens de acesso. A interface foi desenhada seguindo rigorosos padrões de 
-                usabilidade para cansaço visual, luvas de proteção (grandes alvos de toque) e alto contraste para 
-                uso sob luz solar intensa.
+                {lang === "en" 
+                  ? "Field workers and technical personnel access the customized system directly on their smart devices through SMS hyperlinks or QR terminal codes. The user interface has been engineered to withstand glare, dust, visual fatigue, and glove-wearing constraints."
+                  : lang === "es"
+                  ? "Los trabajadores de campo y el personal técnico acceden al sistema directamente en sus dispositivos inteligentes mediante enlaces SMS o códigos QR. La interfaz ha sido diseñada para soportar reflejos, fatiga visual y el uso de guantes de protección."
+                  : "Operários e prestadores de serviços de campo acessam o sistema diretamente de seus celulares através de links SMS ou totens de acesso. A interface foi desenhada seguindo rigorosos padrões de usabilidade para cansaço visual, luvas de proteção (grandes alvos de toque) e alto contraste para uso sob luz solar intensa."
+                }
               </p>
 
               <div className="space-y-3.5">
@@ -123,9 +155,9 @@ export default function App() {
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Alvos de Clique Ampliados (Mín. 44px)</h4>
+                    <h4 className="text-xs font-bold text-slate-900">{TRANSLATIONS[lang].mobileUXCard1Title}</h4>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Teclados de CPF simplificados e cards largos para evitar erros de clique de operários que regressam do trecho.
+                      {TRANSLATIONS[lang].mobileUXCard1Desc}
                     </p>
                   </div>
                 </div>
@@ -135,9 +167,9 @@ export default function App() {
                     <ClipboardCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Acessibilidade Cromática (Color-Safe)</h4>
+                    <h4 className="text-xs font-bold text-slate-900">{TRANSLATIONS[lang].mobileUXCard2Title}</h4>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Os estados de aprovação usam tanto símbolos e ícones gráficos distintos quanto cores. Usuários daltônicos conseguem ler o texto e distinguir as formas instantaneamente sem confusão.
+                      {TRANSLATIONS[lang].mobileUXCard2Desc}
                     </p>
                   </div>
                 </div>
@@ -147,9 +179,9 @@ export default function App() {
                     <Award className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Lógica Gated (Passe Seguro de Entrada)</h4>
+                    <h4 className="text-xs font-bold text-slate-900">{TRANSLATIONS[lang].mobileUXCard3Title}</h4>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      O QR code dinâmico possui autenticação criptografada simulada que muda automaticamente de Bloqueado para Ativo apenas com aprovação de 100% dos requisitos mandatórios.
+                      {TRANSLATIONS[lang].mobileUXCard3Desc}
                     </p>
                   </div>
                 </div>
@@ -162,6 +194,7 @@ export default function App() {
                 workers={workers}
                 onUpdateWorker={handleUpdateSingleWorker}
                 workerSelectedCpf={selectedMobileWorkerCpf}
+                currentLang={lang}
               />
             </div>
           </div>

@@ -39,81 +39,10 @@ export const SAFETY_QUESTIONS = [
   }
 ];
 
-export const INITIAL_WORKERS: Worker[] = [
-  {
-    id: "w1",
-    name: "Carlos Eduardo Silva",
-    cpf: "123.456.789-00",
-    companyName: "Sul Metalúrgica LTDA",
-    companyCnpj: "12.345.678/0001-99",
-    role: "Eletricista Industrial",
-    asoStatus: DocumentStatus.APPROVED,
-    asoFileUrl: "aso_carlos.pdf",
-    nr10Status: DocumentStatus.APPROVED,
-    nr10FileUrl: "nr10_carlos.pdf",
-    nr35Status: DocumentStatus.APPROVED,
-    nr35FileUrl: "nr35_carlos.pdf",
-    videoWatched: true,
-    videoWatchedDuration: 100,
-    quizCompleted: true,
-    quizScore: 3,
-    qrCodeToken: "AM-12345-99-OK"
-  },
-  {
-    id: "w2",
-    name: "Mariana Souza Santos",
-    cpf: "987.654.321-11",
-    companyName: "Sinal Verde Construções",
-    companyCnpj: "98.765.432/0001-11",
-    role: "Técnico de Andaimes",
-    asoStatus: DocumentStatus.UNDER_ANALYSIS,
-    asoFileUrl: "aso_mariana.pdf",
-    nr10Status: DocumentStatus.NOT_APPLICABLE,
-    nr35Status: DocumentStatus.APPROVED,
-    nr35FileUrl: "nr35_mariana.pdf",
-    videoWatched: true,
-    videoWatchedDuration: 100,
-    quizCompleted: true,
-    quizScore: 2,
-    qrCodeToken: undefined
-  },
-  {
-    id: "w3",
-    name: "Jeferson de Oliveira",
-    cpf: "456.789.123-22",
-    companyName: "Sul Metalúrgica LTDA",
-    companyCnpj: "12.345.678/0001-99",
-    role: "Mecânico de Manutenção",
-    asoStatus: DocumentStatus.PENDING,
-    nr10Status: DocumentStatus.PENDING,
-    nr35Status: DocumentStatus.PENDING,
-    videoWatched: false,
-    videoWatchedDuration: 0,
-    quizCompleted: false,
-    qrCodeToken: undefined
-  },
-  {
-    id: "w4",
-    name: "Roberto Gonçalves Alencar",
-    cpf: "654.321.987-55",
-    companyName: "Sinal Verde Construções",
-    companyCnpj: "98.765.432/0001-11",
-    role: "Pintor Industrial",
-    asoStatus: DocumentStatus.BLOCKED,
-    asoFileUrl: "aso_roberto_vencido.pdf",
-    nr10Status: DocumentStatus.NOT_APPLICABLE,
-    nr35Status: DocumentStatus.APPROVED,
-    nr35FileUrl: "nr35_roberto.pdf",
-    videoWatched: true,
-    videoWatchedDuration: 100,
-    quizCompleted: true,
-    quizScore: 3,
-    qrCodeToken: undefined
-  }
-];
+export const INITIAL_WORKERS: Worker[] = [];
 
 export const getStoredWorkers = (): Worker[] => {
-  const cached = localStorage.getItem("am_onboarding_workers");
+  const cached = localStorage.getItem("cl_onboarding_workers");
   if (cached) {
     try {
       return JSON.parse(cached);
@@ -121,10 +50,10 @@ export const getStoredWorkers = (): Worker[] => {
       console.error(e);
     }
   }
-  localStorage.setItem("am_onboarding_workers", JSON.stringify(INITIAL_WORKERS));
+  localStorage.setItem("cl_onboarding_workers", JSON.stringify(INITIAL_WORKERS));
   return INITIAL_WORKERS;
 };
 
 export const saveWorkers = (workers: Worker[]) => {
-  localStorage.setItem("am_onboarding_workers", JSON.stringify(workers));
+  localStorage.setItem("cl_onboarding_workers", JSON.stringify(workers));
 };

@@ -2,23 +2,27 @@ import React, { useState } from "react";
 import { 
   Smartphone, Signal, Battery, Lock, Unlock, CheckCircle2, 
   Clock, XCircle, AlertCircle, Eye, ChevronRight, User, 
-  MapPin, ShieldAlert, Award, QrCode, FileCheck, LogIn, ArrowLeft, RefreshCw, Fingerprint 
+  MapPin, ShieldAlert, Award, QrCode, FileCheck, LogIn, ArrowLeft, RefreshCw, Fingerprint, FileText, Gift 
 } from "lucide-react";
 import { Worker, DocumentStatus } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 import SafetyQuiz from "./SafetyQuiz";
 import { SAFETY_QUESTIONS } from "../utils/mockData";
+import CertificateModal from "./CertificateModal";
+import { LanguageType, TRANSLATIONS } from "../utils/translations";
 
 interface WorkerPortalProps {
   workers: Worker[];
   onUpdateWorker: (updated: Worker) => void;
   workerSelectedCpf?: string; // preselected CPF from admin portal
+  currentLang?: LanguageType;
 }
 
 export default function WorkerPortal({ 
   workers, 
   onUpdateWorker,
-  workerSelectedCpf
+  workerSelectedCpf,
+  currentLang = "pt"
 }: WorkerPortalProps) {
   const [cpfInput, setCpfInput] = useState(workerSelectedCpf || "");
   const [loggedInWorkerId, setLoggedInWorkerId] = useState<string | null>(
@@ -26,6 +30,7 @@ export default function WorkerPortal({
   );
   const [loginError, setLoginError] = useState("");
   const [activeTab, setActiveTab] = useState<"checklist" | "quiz" | "qrcode">("checklist");
+  const [isPortalCertOpen, setIsPortalCertOpen] = useState(false);
   
   // Simulated clock
   const [currentTime] = useState("22:51");
@@ -322,7 +327,39 @@ export default function WorkerPortal({
                             )}
                           </div>
                         </div>
+
+                        {/* Special Award Certification Card directly when completed */}
+                        {activeWorker.quizCompleted && (
+                          <div className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/5 rounded-2xl border-2 border-dashed border-orange-400 flex flex-col space-y-3 shadow-inner">
+                            <div className="flex items-start space-x-3">
+                              <div className="w-9 h-9 rounded-full bg-orange-600 flex items-center justify-center text-white flex-shrink-0">
+                                <Award className="w-5 h-5" />
+                              </div>
+                              <div className="space-y-0.5">
+                                <h5 className="text-xs font-bold text-slate-900">Certificado Homologado</h5>
+                                <p className="text-[10px] text-slate-500">Seu documento de regularidade civil está pronto para emissão digital.</p>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => setIsPortalCertOpen(true)}
+                              className="w-full py-2 bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md"
+                            >
+                              <FileText className="w-4 h-4 text-orange-500" />
+                              <span>Emitir Certificado (PDF)</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
+
+                      {/* Portal Certificate Modal component instantiation */}
+                      {activeWorker && (
+                        <CertificateModal
+                          worker={activeWorker}
+                          isOpen={isPortalCertOpen}
+                          onClose={() => setIsPortalCertOpen(false)}
+                        />
+                      )}
 
                     </motion.div>
                   )}
