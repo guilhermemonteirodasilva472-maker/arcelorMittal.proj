@@ -1,0 +1,6 @@
+{
+  "name": "Onboarding Digital de Terceiros",
+  "description": "Central de integração, upload de NRs, treinamento em segurança e emissão de QR Code de acesso para terceiros da ArcelorMittal",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
